@@ -33,8 +33,8 @@ def get_feature(file_path: str, feature_type:str="MFCC", mean_signal_length:int=
         feature = np.transpose(mfcc)
     return feature
 
-def generate_csv(csv_save:str, data_name: str="EMODB", feature_type: str="MFCC", embed_len: int = 39, mean_signal_length:int = 96000, class_labels: Tuple = ("angry", "boredom", "disgust", "fear", "happy", "neutral","sad")):
-    data_path = "./SER_WAV_DATA/"+data_name# Modify this path
+def generate_csv(csv_save:str, data_name: str="EMODB", data_path: str="./SER_WAV_DATA/", feature_type: str="MFCC", embed_len: int = 39, mean_signal_length:int = 96000, class_labels: Tuple = ("angry", "boredom", "disgust", "fear", "happy", "neutral","sad")):
+    # data_path = "./SER_WAV_DATA/"+data_name# Modify this path
     current_dir =  os.getcwd()
     if not os.path.exists(csv_save):
         print(csv_save+" build succeed")
@@ -104,9 +104,9 @@ def process_csv(data_path: str, mfcc_len: int = 39, class_labels: Tuple = ("angr
     os.chdir(current_dir)
     return np.array(x), np.array(y)
 
-def extract_feature(data_name:str, feature_type_:str="MFCC", mean_signal_length:int=96000, class_labels:Tuple = ("angry", "boredom", "disgust", "fear", "happy", "neutral","sad")):
+def extract_feature(data_name:str, data_path:str, feature_type_:str="MFCC", mean_signal_length:int=96000, class_labels:Tuple = ("angry", "boredom", "disgust", "fear", "happy", "neutral","sad")):
     csv_save = "./"+data_name+"_"+feature_type_+"_"+str(int(mean_signal_length/1000))
-    generate_csv(csv_save=csv_save, data_name=data_name, class_labels=class_labels, feature_type=feature_type_, mean_signal_length=mean_signal_length)
+    generate_csv(csv_save=csv_save, data_name=data_name, data_path=data_path, class_labels=class_labels, feature_type=feature_type_, mean_signal_length=mean_signal_length)
 
 
 EMODB_LABEL = ("angry", "boredom", "disgust", "fear", "happy", "neutral","sad")
@@ -119,7 +119,7 @@ LABEL_DICT = {"CASIA":CASIA_LABEL,"EMODB":EMODB_LABEL,"IEMOCAP":IEMOCAP_LABEL,"E
 PATH_DICT = {"CASIA":"./CASIA_MFCC_88","EMODB":"./EMODB_MFCC_96","IEMOCAP":"./IEMOCAP_MFCC_310","EMOVO":"./EMOVO_MFCC_96","SAVEE":"./SAVEE_MFCC_130","RAVDE":"./RAVDE_MFCC_110"}
 
 # First step: extract speech feature
-extract_feature(data_name=args.data_name, feature_type_="MFCC", mean_signal_length=args.mean_signal_length, class_labels=LABEL_DICT[args.data_name])
+extract_feature(data_name=args.data_name, data_path=args.data_path, feature_type_="MFCC", mean_signal_length=args.mean_signal_length, class_labels=LABEL_DICT[args.data_name])
 # Second step: convert .csv to .npy
 x, y = process_csv(PATH_DICT[args.data_name], class_labels = LABEL_DICT[args.data_name], flatten = False)
 y = to_categorical(y, num_classes=len(LABEL_DICT[args.data_name]))
